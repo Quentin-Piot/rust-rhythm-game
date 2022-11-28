@@ -1,6 +1,8 @@
+mod arrows;
+use arrows::ArrowsPlugin;
+
 use bevy::prelude::*;
-use bevy::render::camera::ScalingMode;
-use bevy::window::PresentMode;
+use bevy::window::{close_on_esc, PresentMode, WindowResized};
 use bevy_editor_pls::prelude::*;
 
 pub const CLEAR: Color = Color::rgb(0.1, 0.1, 0.1);
@@ -11,7 +13,7 @@ fn main() {
         .insert_resource(ClearColor(CLEAR))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
-                title: "Rust Platform Game".to_string(),
+                title: "Rust Rhythm Game".to_string(),
                 width: 1600.,
                 height: 900.,
                 present_mode: PresentMode::AutoVsync,
@@ -19,20 +21,13 @@ fn main() {
             },
             ..default()
         }))
+        .add_system(close_on_esc)
         .add_plugin(EditorPlugin)
+        .add_plugin(ArrowsPlugin)
         .add_startup_system(spawn_camera)
         .run();
 }
 
 fn spawn_camera(mut commands: Commands) {
-    let mut camera = Camera2dBundle::default();
-
-    camera.projection.top = 1.0;
-    camera.projection.bottom = -1.0;
-    camera.projection.right = 1.0;
-    camera.projection.left = -1.0;
-
-    camera.projection.scaling_mode = ScalingMode::None;
-
-    commands.spawn(camera);
+    commands.spawn(Camera2dBundle::default());
 }
