@@ -34,12 +34,12 @@ jobs:
         run: |
           cargo install -f wasm-bindgen-cli
           cargo build --release --target wasm32-unknown-unknown
-          wasm-bindgen --out-dir ./out/ --target web ./target/wasm32-unknown-unknown/release/rust-rhythm-game.wasm
+          wasm-bindgen --out-dir ./build/out --target web ./target/wasm32-unknown-unknown/release/rust-rhythm-game.wasm
 
       - name: Copy assets and index.html
         run: |
-          cp index.html ./out/
-          cp -r assets/ ./out          
+          cp index.html ./build/out
+          cp -r assets/ ./build/out          
         
 
       - name: Upload builds folders
@@ -47,7 +47,7 @@ jobs:
         with:
           name: builds
           path: |
-            out/
+            build/
 
 
   game-docker-build:
@@ -61,8 +61,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-
-
 
       - name: Download Rust build
         uses: actions/download-artifact@v3
@@ -81,8 +79,8 @@ jobs:
       - name: Build and Push Container
         run: |
           ls
-          docker build --cache-from asia.gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -t asia.gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -f .
-          docker push asia.gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE }}:latest
+          docker build --cache-from asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -t asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -f .
+          docker push asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest
 
   app-deploy:
     runs-on: ubuntu-latest
@@ -91,8 +89,6 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-    env:
-      SERVICE: "${{ secrets.GCP_APP_NAME }}"
     steps:
       - id: "auth"
         name: "Authenticate to Google Cloud"
@@ -104,9 +100,9 @@ jobs:
       - name: 'Deploy to Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
-            service: '${{ env.GCP_APP_NAME }}'
-            image: 'asia.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest'
-            region: '${{ env.GCP_REGION }}'
+            service: '${{ secrets.GCP_APP_NAME }}'
+            image: 'asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest'
+            region: '${{ secrets.GCP_REGION }}'
 
       # If required, use the Cloud Run url output in later steps
       - name: Show Output
