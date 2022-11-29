@@ -1,7 +1,6 @@
-use crate::consts::{BASE_SPEED, SPAWN_POSITION};
+use crate::consts::{BASE_SPEED, SPAWN_POSITION, TARGET_POSITION, THRESHOLD};
 use crate::types::{Directions, SongConfig, Speed};
 use bevy::prelude::*;
-use rand::Rng;
 
 #[derive(Resource)]
 struct ArrowMaterialResource {
@@ -43,7 +42,6 @@ fn spawn_arrows(
     mut song_config: ResMut<SongConfig>,
     materials: Res<ArrowMaterialResource>,
     time: Res<Time>,
-    mut timer: ResMut<SpawnTimer>,
 ) {
     let secs = time.elapsed_seconds_f64() - 3.;
     let secs_last = secs - time.delta_seconds_f64();
@@ -97,12 +95,60 @@ fn move_arrows(time: Res<Time>, mut query: Query<(&mut Transform, &Arrow)>) {
     }
 }
 
+#[derive(Component)]
+struct TargetArrow;
+
+fn setup_target_arrows(mut commands: Commands, materials: Res<ArrowMaterialResource>) {
+    use Directions::*;
+    let directions = [Up, Down, Left, Right];
+
+    for direction in directions.iter() {
+        let mut transform =
+            Transform::from_translation(Vec3::new(TARGET_POSITION, direction.y(), 1.));
+        transform.rotate(Quat::from_rotation_z(direction.rotation()));
+        commands
+            .spawn(SpriteBundle {
+                texture: materials.border_texture.clone(),
+                sprite: Sprite {
+                    custom_size: Some(Vec2::new(140., 140.)),
+                    ..default()
+                },
+                transform,
+                ..Default::default()
+            })
+            .insert(TargetArrow);
+    }
+}
+
+fn despawn_arrows(
+    mut commands: Commands,
+    query: Query<(Entity, &Transform, &Arrow)>,
+    keyboard_input: Res<Input<KeyCode>>,
+) {
+    for (entity, transform, arrow) in query.iter() {
+        let pos = transform.translation.x;
+
+        // Check if arrow is inside clicking threshold
+        if (TARGET_POSITION - THRESHOLD..=TARGET_POSITION + THRESHOLD).contains(&pos)
+            && arrow.direction.key_just_pressed(&keyboard_input)
+        {
+            commands.entity(entity).despawn();
+        }
+
+        if pos >= 2. * TARGET_POSITION {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
 pub struct ArrowsPlugin;
 impl Plugin for ArrowsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ArrowMaterialResource>()
             .insert_resource(SpawnTimer(Timer::from_seconds(1.0, TimerMode::Repeating)))
             .add_system(spawn_arrows)
-            .add_system(move_arrows);
+            .add_system(move_arrows)
+            .add_system(setup_target_arrows)
+            .add_system(despawn_arrows);
     }
 }

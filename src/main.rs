@@ -5,12 +5,14 @@ mod types;
 use arrows::ArrowsPlugin;
 
 use bevy::prelude::*;
-use bevy::window::{close_on_esc, PresentMode, WindowResized};
+use bevy::window::{close_on_esc, PresentMode};
 use bevy_editor_pls::prelude::*;
+use wasm_bindgen::prelude::*;
 
 pub const CLEAR: Color = Color::rgb(0.1, 0.1, 0.1);
 pub const RESOLUTION: f32 = 16.0 / 9.0;
 
+#[wasm_bindgen]
 fn main() {
     let config = types::load_config();
 
