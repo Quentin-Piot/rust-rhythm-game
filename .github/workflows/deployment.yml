@@ -87,7 +87,7 @@ jobs:
   app-deploy:
     runs-on: ubuntu-latest
     name: Web platform deploy
-    needs: ["web-docker-build"]
+    needs: ["game-docker-build"]
     permissions:
       contents: 'read'
       id-token: 'write'
