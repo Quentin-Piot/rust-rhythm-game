@@ -78,8 +78,7 @@ jobs:
 
       - name: Build and Push Container
         run: |
-          ls
-          docker build --cache-from asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -t asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -f .
+          docker build --cache-from asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -t asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest .
           docker push asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest
 
   app-deploy:
