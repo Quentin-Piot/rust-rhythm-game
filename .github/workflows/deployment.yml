@@ -1,0 +1,113 @@
+name: Codebases deployment
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - '.github/**'
+
+env:
+  PROJECT_ID: "${{ secrets.GCLOUD_PROJECT_ID }}"
+  REGION: "${{ secrets.GCP_REGION }}"
+
+jobs:
+  build:
+    name: Build
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    container: rust:1.65
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+
+      - name: Install dependencies
+        run: |
+          apt-get update && apt-get install -y g++ pkg-config libx11-dev libasound2-dev libudev-dev
+          rustup target add wasm32-unknown-unknown
+
+      - name: Build
+        run: |
+          cargo install -f wasm-bindgen-cli
+          cargo build --release --target wasm32-unknown-unknown
+          wasm-bindgen --out-dir ./out/ --target web ./target/wasm32-unknown-unknown/release/rust-rhythm-game.wasm
+
+      - name: Copy assets and index.html
+        run: |
+          cp index.html ./out/
+          cp -r assets/ ./out          
+        
+
+      - name: Upload builds folders
+        uses: actions/upload-artifact@v3
+        with:
+          name: builds
+          path: |
+            ./out
+
+
+  web-docker-build:
+    runs-on: ubuntu-latest
+    name: Game Docker
+    needs: ["build"]
+    env:
+      SERVICE: github-web-v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+
+
+      - name: Download Rust build
+        uses: actions/download-artifact@v3
+        with:
+          name: builds
+
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
+
+      - name: Configure docker
+        run: gcloud auth configure-docker
+
+      - name: Build and Push Container
+        run: |
+          ls
+          docker build --cache-from eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest -t eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest -f .
+          docker push eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+
+  app-deploy:
+    runs-on: ubuntu-latest
+    name: Web platform deploy
+    needs: ["web-docker-build"]
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      SERVICE: "${{ secrets.GCP_APP_NAME }}"
+    steps:
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
+
+
+      - name: 'Deploy to Cloud Run'
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+            service: '${{ env.GCP_APP_NAME }}'
+            image: 'eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest'
+            region: '${{ env.GCP_REGION }}'
+
+      # If required, use the Cloud Run url output in later steps
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
