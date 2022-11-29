@@ -26,4 +26,3 @@ channel = "nightly"
 [profile.release]
 lto = "thin"
 
-
