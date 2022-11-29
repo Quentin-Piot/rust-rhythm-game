@@ -1,4 +1,4 @@
-name: Codebases deployment
+name: Game web deployment
 
 on:
   push:
@@ -47,10 +47,10 @@ jobs:
         with:
           name: builds
           path: |
-            ./out
+            out/
 
 
-  web-docker-build:
+  game-docker-build:
     runs-on: ubuntu-latest
     name: Game Docker
     needs: ["build"]
@@ -81,8 +81,8 @@ jobs:
       - name: Build and Push Container
         run: |
           ls
-          docker build --cache-from eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest -t eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest -f .
-          docker push eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+          docker build --cache-from asia.gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -t asia.gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}:latest -f .
+          docker push asia.gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE }}:latest
 
   app-deploy:
     runs-on: ubuntu-latest
@@ -105,7 +105,7 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
             service: '${{ env.GCP_APP_NAME }}'
-            image: 'eu.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest'
+            image: 'asia.gcr.io/${{ env.PROJECT_ID }}/${{ env.GCP_APP_NAME }}:latest'
             region: '${{ env.GCP_REGION }}'
 
       # If required, use the Cloud Run url output in later steps
