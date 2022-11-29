@@ -109,7 +109,16 @@ pub fn load_config() -> SongConfig {
             ArrowTime::new(3., Speed::Slow, Directions::Left),
             ArrowTime::new(4., Speed::Medium, Directions::Up),
             ArrowTime::new(5., Speed::Fast, Directions::Right),
-        ]
-        .repeat(10),
+            ArrowTime::new(6., Speed::Slow, Directions::Up),
+            ArrowTime::new(7., Speed::Slow, Directions::Down),
+            ArrowTime::new(8., Speed::Slow, Directions::Left),
+            ArrowTime::new(9., Speed::Medium, Directions::Up),
+            ArrowTime::new(10., Speed::Fast, Directions::Right),
+            ArrowTime::new(11., Speed::Slow, Directions::Up),
+            ArrowTime::new(12., Speed::Slow, Directions::Down),
+            ArrowTime::new(13., Speed::Slow, Directions::Left),
+            ArrowTime::new(14., Speed::Medium, Directions::Up),
+            ArrowTime::new(15., Speed::Fast, Directions::Right),
+        ],
     }
 }

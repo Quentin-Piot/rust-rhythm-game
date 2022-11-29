@@ -22,18 +22,19 @@ fn main() {
                 title: "Rust Rhythm Game".to_string(),
                 width: 1280.,
                 height: 720.,
+                fit_canvas_to_parent: true,
                 present_mode: PresentMode::AutoVsync,
                 resizable: false,
                 ..default()
             },
             ..default()
         }))
+        .insert_resource(config)
         .add_system(close_on_esc)
         .add_plugin(EditorPlugin)
         .add_plugin(ArrowsPlugin)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(spawn_camera)
-        .insert_resource(config)
         .run();
 }
 

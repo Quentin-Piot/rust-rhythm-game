@@ -34,8 +34,6 @@ struct Arrow {
     speed: Speed,
     direction: Directions,
 }
-#[derive(Resource)]
-struct SpawnTimer(Timer);
 
 fn spawn_arrows(
     mut commands: Commands,
@@ -145,10 +143,9 @@ pub struct ArrowsPlugin;
 impl Plugin for ArrowsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ArrowMaterialResource>()
-            .insert_resource(SpawnTimer(Timer::from_seconds(1.0, TimerMode::Repeating)))
+            .add_startup_system(setup_target_arrows)
             .add_system(spawn_arrows)
             .add_system(move_arrows)
-            .add_system(setup_target_arrows)
             .add_system(despawn_arrows);
     }
 }
