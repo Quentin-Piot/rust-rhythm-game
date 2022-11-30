@@ -38,7 +38,7 @@ jobs:
 
       - name: Copy assets and index.html
         run: |
-          cp index.html ./build/out
+          cp -r web/** ./build/out
           cp -r assets/ ./build/out          
         
 
