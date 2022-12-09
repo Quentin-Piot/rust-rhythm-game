@@ -1,11 +1,13 @@
 mod arrows;
 mod consts;
+mod score;
 mod types;
 mod ui;
 
 use arrows::ArrowsPlugin;
 use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 
+use crate::score::ScoreResource;
 use crate::ui::UIPlugin;
 use bevy::prelude::*;
 use bevy::window::{close_on_esc, PresentMode};
@@ -13,6 +15,8 @@ use bevy_editor_pls::prelude::*;
 
 pub const CLEAR: Color = Color::rgb(0.7, 0.7, 0.7);
 pub const RESOLUTION: f32 = 16.0 / 9.0;
+pub const WINDOW_WIDTH: f32 = 1280.;
+pub const WINDOW_HEIGHT: f32 = 800.;
 
 fn main() {
     let config = types::load_config();
@@ -22,8 +26,8 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 title: "Rust Rhythm Game".to_string(),
-                width: 1280.,
-                height: 720.,
+                width: WINDOW_WIDTH,
+                height: WINDOW_HEIGHT,
                 fit_canvas_to_parent: true,
                 present_mode: PresentMode::AutoVsync,
                 resizable: false,
@@ -32,12 +36,13 @@ fn main() {
             ..default()
         }))
         .insert_resource(config)
+        .insert_resource(ScoreResource::default())
         .add_system(close_on_esc)
         .add_plugin(EditorPlugin)
-        .add_plugin(ArrowsPlugin)
         .add_plugin(UIPlugin)
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(spawn_camera)
+        .add_plugin(ArrowsPlugin)
         .run();
 }
 

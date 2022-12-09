@@ -1,4 +1,5 @@
 use crate::consts::{BASE_SPEED, SPAWN_POSITION, TARGET_POSITION, THRESHOLD};
+use crate::score::ScoreResource;
 use crate::types::{Directions, SongConfig, Speed};
 use bevy::prelude::*;
 
@@ -122,6 +123,7 @@ fn despawn_arrows(
     mut commands: Commands,
     query: Query<(Entity, &Transform, &Arrow)>,
     keyboard_input: Res<Input<KeyCode>>,
+    mut score: ResMut<ScoreResource>,
 ) {
     for (entity, transform, arrow) in query.iter() {
         let pos = transform.translation.x;
@@ -131,10 +133,12 @@ fn despawn_arrows(
             && arrow.direction.key_just_pressed(&keyboard_input)
         {
             commands.entity(entity).despawn();
+            score.increase_correct(TARGET_POSITION - pos);
         }
 
         if pos >= 2. * TARGET_POSITION {
             commands.entity(entity).despawn();
+            score.increase_fails();
         }
     }
 }

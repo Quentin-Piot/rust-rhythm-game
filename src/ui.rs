@@ -1,3 +1,4 @@
+use crate::score::ScoreResource;
 use bevy::prelude::*;
 
 fn setup_ui(mut commands: Commands, asset_server: ResMut<AssetServer>) {
@@ -73,17 +74,19 @@ fn setup_ui(mut commands: Commands, asset_server: ResMut<AssetServer>) {
             ..Default::default()
         })
         .with_children(|parent| {
-            parent.spawn(TextBundle {
-                text: Text::from_section(
-                    "Quentin Piot",
-                    TextStyle {
-                        font_size: 20.0,
-                        font: font.clone(),
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                    },
-                ),
-                ..Default::default()
-            });
+            parent
+                .spawn(TextBundle {
+                    text: Text::from_section(
+                        "Score: 0. Corrects: 0. Fails: 0",
+                        TextStyle {
+                            font_size: 40.0,
+                            font: font.clone(),
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    ),
+                    ..Default::default()
+                })
+                .insert(ScoreText);
         });
 }
 
@@ -104,10 +107,24 @@ fn update_time_text(time: Res<Time>, mut query: Query<(&mut Text, &TimeText)>) {
     }
 }
 
+#[derive(Component)]
+struct ScoreText;
+fn update_score_text(score: Res<ScoreResource>, mut query: Query<(&mut Text, &ScoreText)>) {
+    for (mut text, _marker) in query.iter_mut() {
+        text.sections[0].value = format!(
+            "Score: {}. Corrects: {}. Fails: {}",
+            score.score(),
+            score.corrects(),
+            score.fails()
+        );
+    }
+}
+
 pub struct UIPlugin;
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup_ui)
-            .add_system(update_time_text);
+            .add_system(update_time_text)
+            .add_system(update_score_text);
     }
 }
