@@ -1,17 +1,17 @@
 mod arrows;
+mod background;
 mod consts;
 mod score;
 mod types;
 mod ui;
 
 use arrows::ArrowsPlugin;
-use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 
+use crate::background::BackgroundPlugin;
 use crate::score::ScoreResource;
 use crate::ui::UIPlugin;
 use bevy::prelude::*;
 use bevy::window::{close_on_esc, PresentMode};
-use bevy_editor_pls::prelude::*;
 
 pub const CLEAR: Color = Color::rgb(0.7, 0.7, 0.7);
 pub const RESOLUTION: f32 = 16.0 / 9.0;
@@ -38,11 +38,10 @@ fn main() {
         .insert_resource(config)
         .insert_resource(ScoreResource::default())
         .add_system(close_on_esc)
-        .add_plugin(EditorPlugin)
         .add_plugin(UIPlugin)
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_startup_system(spawn_camera)
         .add_plugin(ArrowsPlugin)
+        .add_plugin(BackgroundPlugin)
+        .add_startup_system(spawn_camera)
         .run();
 }
 
