@@ -27,6 +27,3 @@ channel = "nightly"
 
 [profile.release]
 lto = "thin"
-
-[target.wasm32-unknown-unknown]
-runner = "wasm-server-runner"

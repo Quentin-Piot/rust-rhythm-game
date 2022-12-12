@@ -16,4 +16,5 @@ Cargo.lock
 
 
 .env
-/.fleet/
+**/.DS_Store
+/.fleet
