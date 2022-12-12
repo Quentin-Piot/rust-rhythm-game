@@ -4,18 +4,18 @@
 #import bevy_sprite::mesh2d_view_bindings
 #import bevy_sprite::mesh2d_bindings
 
-let iterations = 17;
+let iterations = 14;
 let formuparam = 0.53;
 
-let volsteps = 20;
-let stepsize = 0.1;
+let volsteps = 10;
+let stepsize = 0.2;
 
 let zoom = 0.800;
 let tile = 0.850;
-let speed = 0.003;
+let speed = 0.010;
 
 let brightness = 0.0015;
-let darkmatter = 0.600;
+let darkmatter = 0.300;
 let distfading = 0.730;
 let saturation = 0.850;
 

@@ -5,8 +5,8 @@ use bevy::{
     sprite::{Material2d, MaterialMesh2dBundle},
 };
 
-use bevy::prelude::*;
 use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use bevy::prelude::*;
 
 // Plugin that will insert a background at Z = -10.0, use the custom 'Star Nest' shader
 pub struct BackgroundPlugin;
@@ -22,13 +22,14 @@ fn spawn_background(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<BackgroundMaterial>>,
+    mut windows: ResMut<Windows>,
 ) {
+    let window = windows.get_primary_mut().unwrap();
     commands.spawn(MaterialMesh2dBundle {
         mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
         transform: Transform {
             translation: Vec3::new(0.0, 0.0, 0.0),
-            scale: Vec3::new(WINDOW_WIDTH, WINDOW_HEIGHT
-                             , 1.0),
+            scale: Vec3::new(window.width(), window.height(), 1.0),
             ..Default::default()
         },
         material: materials.add(BackgroundMaterial {}),

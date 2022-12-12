@@ -1,10 +1,13 @@
 use core::f32::consts::PI;
+use std::fs::File;
+use std::io::Read;
 
 use crate::consts::{BASE_SPEED, DISTANCE};
 use bevy::input::{keyboard::KeyCode, Input};
 use bevy::prelude::*;
+use serde_derive::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub enum Directions {
     Up,
     Down,
@@ -23,18 +26,6 @@ impl Directions {
         };
 
         keys.iter().any(|code| input.just_pressed(*code))
-    }
-
-    /// Checks if a key that corresponds to this direction is being pressed
-    pub fn key_pressed(&self, input: &Input<KeyCode>) -> bool {
-        let keys = match self {
-            Directions::Up => [KeyCode::Up, KeyCode::D],
-            Directions::Down => [KeyCode::Down, KeyCode::F],
-            Directions::Left => [KeyCode::Left, KeyCode::J],
-            Directions::Right => [KeyCode::Right, KeyCode::K],
-        };
-
-        keys.iter().any(|code| input.pressed(*code))
     }
 
     /// Returns the correct rotation for an arrow with this direction
@@ -58,7 +49,7 @@ impl Directions {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub enum Speed {
     Slow,
     Medium,
@@ -87,38 +78,65 @@ pub struct ArrowTime {
     pub direction: Directions,
 }
 impl ArrowTime {
-    fn new(click_time: f64, speed: Speed, direction: Directions) -> Self {
-        let speed_value = speed.value();
+    fn new(arrow: &ArrowTimeToml) -> Self {
+        let speed_value = arrow.speed.value();
+        println!("click time {} speedvalue {}", arrow.click_time, speed_value);
         Self {
-            spawn_time: click_time - (DISTANCE / speed_value) as f64,
-            speed,
-            direction,
+            spawn_time: arrow.click_time - (DISTANCE / speed_value) as f64,
+            speed: arrow.speed,
+            direction: arrow.direction,
         }
     }
 }
 
 #[derive(Resource)]
+
 pub struct SongConfig {
+    pub name: String,
+    pub song_audio: Handle<AudioSource>,
     pub arrows: Vec<ArrowTime>,
 }
-pub fn load_config() -> SongConfig {
+
+pub fn load_config(path: &str, asset_server: &Res<AssetServer>) -> SongConfig {
+    // Open file and read contents
+    let mut file = File::open(format!("assets/songs/{}", path)).expect("Couldn't open file");
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)
+        .expect("Couldn't read file into String");
+
+    // Parse using toml and Serde
+    let parsed: SongConfigToml =
+        toml::from_str(&contents).expect("Couldn't parse into SongConfigToml");
+
+    // Process arrows
+    let mut arrows = parsed
+        .arrows
+        .iter()
+        .map(|arr| ArrowTime::new(arr))
+        .collect::<Vec<ArrowTime>>();
+    // Sort arrows by spawn_time
+    arrows.sort_by(|a, b| a.spawn_time.partial_cmp(&b.spawn_time).unwrap());
+
+    // Load song audio and get the handle
+    let song_audio = asset_server.load(&*format!("songs/{}", parsed.filename));
+
     SongConfig {
-        arrows: vec![
-            ArrowTime::new(1., Speed::Slow, Directions::Up),
-            ArrowTime::new(2., Speed::Slow, Directions::Down),
-            ArrowTime::new(3., Speed::Slow, Directions::Left),
-            ArrowTime::new(4., Speed::Medium, Directions::Up),
-            ArrowTime::new(5., Speed::Fast, Directions::Right),
-            ArrowTime::new(6., Speed::Slow, Directions::Up),
-            ArrowTime::new(7., Speed::Slow, Directions::Down),
-            ArrowTime::new(8., Speed::Slow, Directions::Left),
-            ArrowTime::new(9., Speed::Medium, Directions::Up),
-            ArrowTime::new(10., Speed::Fast, Directions::Right),
-            ArrowTime::new(11., Speed::Slow, Directions::Up),
-            ArrowTime::new(12., Speed::Slow, Directions::Down),
-            ArrowTime::new(13., Speed::Slow, Directions::Left),
-            ArrowTime::new(14., Speed::Medium, Directions::Up),
-            ArrowTime::new(15., Speed::Fast, Directions::Right),
-        ],
+        name: parsed.name,
+        song_audio,
+        arrows,
     }
+}
+
+#[derive(Deserialize, Debug)]
+struct SongConfigToml {
+    pub name: String,
+    pub filename: String,
+    pub arrows: Vec<ArrowTimeToml>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ArrowTimeToml {
+    pub click_time: f64,
+    pub speed: Speed,
+    pub direction: Directions,
 }
