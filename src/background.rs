@@ -5,7 +5,6 @@ use bevy::{
     sprite::{Material2d, MaterialMesh2dBundle},
 };
 
-use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 
 // Plugin that will insert a background at Z = -10.0, use the custom 'Star Nest' shader

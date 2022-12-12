@@ -1,11 +1,11 @@
-use core::f32::consts::PI;
-use std::fs::File;
-use std::io::Read;
-
 use crate::consts::{BASE_SPEED, DISTANCE};
 use bevy::input::{keyboard::KeyCode, Input};
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::AudioSource;
+use core::f32::consts::PI;
 use serde_derive::{Deserialize, Serialize};
+use std::fs::File;
+use std::io::Read;
 
 #[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub enum Directions {

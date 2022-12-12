@@ -1,5 +1,6 @@
 use crate::types::SongConfig;
 use bevy::prelude::*;
+use bevy_kira_audio::{Audio, AudioControl, AudioPlugin};
 
 fn start_song(audio: Res<Audio>, time: Res<Time>, config: Res<SongConfig>) {
     let secs = time.elapsed_seconds_f64();
@@ -10,9 +11,9 @@ fn start_song(audio: Res<Audio>, time: Res<Time>, config: Res<SongConfig>) {
     }
 }
 
-pub struct AudioPlugin;
-impl Plugin for AudioPlugin {
+pub struct CustomAudioPlugin;
+impl Plugin for CustomAudioPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(start_song);
+        app.add_plugin(AudioPlugin).add_system(start_song);
     }
 }

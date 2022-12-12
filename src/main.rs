@@ -8,7 +8,7 @@ mod ui;
 
 use arrows::ArrowsPlugin;
 
-use crate::audio::AudioPlugin;
+use crate::audio::{CustomAudioPlugin};
 use crate::background::BackgroundPlugin;
 use crate::score::ScoreResource;
 use crate::ui::UIPlugin;
@@ -40,7 +40,7 @@ fn main() {
         .add_plugin(UIPlugin)
         .add_plugin(ArrowsPlugin)
         .add_plugin(BackgroundPlugin)
-        .add_plugin(AudioPlugin)
+        .add_plugin(CustomAudioPlugin)
         .add_startup_system(spawn_camera)
         .run();
 }
