@@ -10,13 +10,13 @@ repository = "https://github.com/Quentin-Piot/rust-platform-game"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.9.1", features=["mp3"]}
+bevy = { version = "0.9.1"}
 futures = "0.3.25"
 rand = "0.8.5"
 reqwest = "0.11.13"
 serde = "1.0.150"
 serde_derive = "1.0.150"
-tokio = { version = "1.23.0", features = ["full"] }
+tokio = { version = "1.23.0", features = ["rt", "macros"] }
 toml = "0.5.9"
 
 [profile.dev]
@@ -24,9 +24,6 @@ opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
-
-[toolchain]
-channel = "nightly"
 
 [profile.release]
 lto = "thin"
