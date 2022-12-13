@@ -1,6 +1,7 @@
 mod arrows;
 mod audio;
 mod background;
+mod client;
 mod consts;
 mod score;
 mod types;
@@ -8,7 +9,7 @@ mod ui;
 
 use arrows::ArrowsPlugin;
 
-use crate::audio::{CustomAudioPlugin};
+use crate::audio::CustomAudioPlugin;
 use crate::background::BackgroundPlugin;
 use crate::score::ScoreResource;
 use crate::ui::UIPlugin;

@@ -1,4 +1,4 @@
-use crate::consts::{BASE_SPEED, SPAWN_POSITION, TARGET_POSITION, THRESHOLD};
+use crate::consts::{SPAWN_POSITION, TARGET_POSITION, THRESHOLD};
 use crate::score::ScoreResource;
 use crate::types::{Directions, SongConfig, Speed};
 use bevy::prelude::*;
@@ -90,7 +90,7 @@ fn spawn_arrows(
 
 fn move_arrows(time: Res<Time>, mut query: Query<(&mut Transform, &Arrow)>) {
     for (mut transform, arrow) in query.iter_mut() {
-        transform.translation.x += time.delta_seconds() * arrow.speed.value()  ;
+        transform.translation.x += time.delta_seconds() * arrow.speed.value();
     }
 }
 

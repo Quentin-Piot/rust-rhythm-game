@@ -1,10 +1,9 @@
+use crate::client::get_song;
 use crate::consts::{BASE_SPEED, DISTANCE};
 use bevy::input::{keyboard::KeyCode, Input};
 use bevy::prelude::*;
-use bevy_kira_audio::prelude::AudioSource;
 use core::f32::consts::PI;
 use serde_derive::{Deserialize, Serialize};
-use std::fs::File;
 use std::io::Read;
 
 #[derive(Copy, Clone, Debug, Deserialize, Serialize)]
@@ -80,7 +79,6 @@ pub struct ArrowTime {
 impl ArrowTime {
     fn new(arrow: &ArrowTimeToml) -> Self {
         let speed_value = arrow.speed.value();
-        println!("click time {} speedvalue {}", arrow.click_time, speed_value);
         Self {
             spawn_time: arrow.click_time - (DISTANCE / speed_value) as f64,
             speed: arrow.speed,
@@ -97,9 +95,12 @@ pub struct SongConfig {
     pub arrows: Vec<ArrowTime>,
 }
 
-pub fn load_config(path: &str, asset_server: &Res<AssetServer>) -> SongConfig {
+pub fn load_config(_path: &str, asset_server: &Res<AssetServer>) -> SongConfig {
     // Open file and read contents
-    let mut file = File::open(format!("assets/songs/{}", path)).expect("Couldn't open file");
+    let mut file = get_song();
+
+    info!("Config created");
+
     let mut contents = String::new();
     file.read_to_string(&mut contents)
         .expect("Couldn't read file into String");
