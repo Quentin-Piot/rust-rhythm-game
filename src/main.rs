@@ -1,7 +1,6 @@
 mod arrows;
 mod audio;
 mod background;
-mod client;
 mod consts;
 mod score;
 mod types;

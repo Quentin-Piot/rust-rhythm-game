@@ -1,10 +1,11 @@
-use crate::client::get_song;
 use crate::consts::{BASE_SPEED, DISTANCE};
 use bevy::input::{keyboard::KeyCode, Input};
 use bevy::prelude::*;
 use core::f32::consts::PI;
 use serde_derive::{Deserialize, Serialize};
 use std::io::Read;
+
+const HARDCODED_CONFIG: &str = "name = \"Test song\"\r\nfilename = \"territory.ogg\"\r\n\r\narrows = [\r\n    { click_time = 2.30, speed = \"Slow\", direction = \"Up\" },\r\n    { click_time = 3.30, speed = \"Fast\", direction = \"Left\" },\r\n    { click_time = 4.30, speed = \"Slow\", direction = \"Right\" },\r\n    { click_time = 5.30, speed = \"Slow\", direction = \"Up\" },\r\n    { click_time = 6.30, speed = \"Medium\", direction = \"Up\" },\r\n    { click_time = 9.00, speed = \"Slow\", direction = \"Left\" },\r\n    { click_time = 10.00, speed = \"Slow\", direction = \"Right\" },\r\n    { click_time = 10.50, speed = \"Medium\", direction = \"Right\" },\r\n    { click_time = 11.00, speed = \"Slow\", direction = \"Up\" },\r\n    { click_time = 11.00, speed = \"Slow\", direction = \"Down\" },\r\n]";
 
 #[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub enum Directions {
@@ -96,18 +97,19 @@ pub struct SongConfig {
 }
 
 pub fn load_config(_path: &str, asset_server: &Res<AssetServer>) -> SongConfig {
-    // Open file and read contents
-    let mut file = get_song();
+    // TODO: Make online request working with wasm
 
-    info!("Config created");
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .expect("Couldn't read file into String");
+    // let mut file = get_song();
+    //
+    // info!("Config created");
+    //
+    // let mut contents = String::new();
+    // file.read_to_string(&mut contents)
+    //     .expect("Couldn't read file into String");
 
     // Parse using toml and Serde
     let parsed: SongConfigToml =
-        toml::from_str(&contents).expect("Couldn't parse into SongConfigToml");
+        toml::from_str(HARDCODED_CONFIG).expect("Couldn't parse into SongConfigToml");
 
     // Process arrows
     let mut arrows = parsed

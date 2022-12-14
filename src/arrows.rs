@@ -91,6 +91,12 @@ fn spawn_arrows(
 fn move_arrows(time: Res<Time>, mut query: Query<(&mut Transform, &Arrow)>) {
     for (mut transform, arrow) in query.iter_mut() {
         transform.translation.x += time.delta_seconds() * arrow.speed.value();
+
+        let distance_after_target = transform.translation.x - (TARGET_POSITION + THRESHOLD);
+        if distance_after_target >= 0.02 {
+            let scale = ((100. - distance_after_target / 3.) / 100.).max(0.2);
+            transform.scale = Vec3::splat(scale);
+        }
     }
 }
 
