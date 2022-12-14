@@ -1,5 +1,6 @@
-use crate::consts::{SPAWN_POSITION, TARGET_POSITION, THRESHOLD};
+use crate::consts::{AppState, SPAWN_POSITION, TARGET_POSITION, THRESHOLD};
 use crate::score::ScoreResource;
+use crate::time::ControlledTime;
 use crate::types::{Directions, SongConfig, Speed};
 use bevy::prelude::*;
 
@@ -40,9 +41,9 @@ fn spawn_arrows(
     mut commands: Commands,
     mut song_config: ResMut<SongConfig>,
     materials: Res<ArrowMaterialResource>,
-    time: Res<Time>,
+    time: Res<ControlledTime>,
 ) {
-    let secs = time.elapsed_seconds_f64() - 3.;
+    let secs = time.seconds_since_startup() - 3.;
     let secs_last = secs - time.delta_seconds_f64();
 
     // Counter of how many arrows we need to spawn and remove from the list
@@ -88,7 +89,7 @@ fn spawn_arrows(
     }
 }
 
-fn move_arrows(time: Res<Time>, mut query: Query<(&mut Transform, &Arrow)>) {
+fn move_arrows(time: Res<ControlledTime>, mut query: Query<(&mut Transform, &Arrow)>) {
     for (mut transform, arrow) in query.iter_mut() {
         transform.translation.x += time.delta_seconds() * arrow.speed.value();
 
@@ -153,9 +154,12 @@ pub struct ArrowsPlugin;
 impl Plugin for ArrowsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ArrowMaterialResource>()
-            .add_startup_system(setup_target_arrows)
-            .add_system(spawn_arrows)
-            .add_system(move_arrows)
-            .add_system(despawn_arrows);
+            .add_system_set(SystemSet::on_enter(AppState::Game).with_system(setup_target_arrows))
+            .add_system_set(
+                SystemSet::on_update(AppState::Game)
+                    .with_system(spawn_arrows)
+                    .with_system(move_arrows)
+                    .with_system(despawn_arrows),
+            );
     }
 }

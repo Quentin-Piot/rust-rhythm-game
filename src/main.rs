@@ -2,7 +2,9 @@ mod arrows;
 mod audio;
 mod background;
 mod consts;
+mod menu;
 mod score;
+mod time;
 mod types;
 mod ui;
 
@@ -10,7 +12,10 @@ use arrows::ArrowsPlugin;
 
 use crate::audio::CustomAudioPlugin;
 use crate::background::BackgroundPlugin;
+use crate::consts::AppState;
+use crate::menu::MenuPlugin;
 use crate::score::ScoreResource;
+use crate::time::TimePlugin;
 use crate::ui::UIPlugin;
 use bevy::prelude::*;
 use bevy::window::{close_on_esc, PresentMode};
@@ -34,6 +39,7 @@ fn main() {
             },
             ..default()
         }))
+        .add_state(AppState::Menu)
         .insert_resource(ScoreResource::default())
         .add_startup_system(setup)
         .add_system(close_on_esc)
@@ -41,6 +47,8 @@ fn main() {
         .add_plugin(ArrowsPlugin)
         .add_plugin(BackgroundPlugin)
         .add_plugin(CustomAudioPlugin)
+        .add_plugin(MenuPlugin)
+        .add_plugin(TimePlugin)
         .add_startup_system(spawn_camera)
         .run();
 }

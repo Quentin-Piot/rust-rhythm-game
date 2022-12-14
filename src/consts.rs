@@ -12,3 +12,10 @@ pub const THRESHOLD: f32 = 20.;
 
 /// Total distance traveled by an arrow, from spawn to target
 pub const DISTANCE: f32 = TARGET_POSITION - SPAWN_POSITION;
+
+/// States
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub enum AppState {
+    Menu,
+    Game,
+}
