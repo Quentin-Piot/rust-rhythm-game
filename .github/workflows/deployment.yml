@@ -7,6 +7,9 @@ on:
     paths:
       - "src/**"
       - '.github/**'
+      - 'assets/**'
+      - 'web/**'
+
 
 env:
   PROJECT_ID: "${{ secrets.GCLOUD_PROJECT_ID }}"
