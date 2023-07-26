@@ -12,9 +12,9 @@ repository = "https://github.com/Quentin-Piot/rust-platform-game"
 [dependencies]
 bevy = { version = "0.9.1"}
 rand = "0.8.5"
-serde = "1.0.150"
-serde_derive = "1.0.150"
-toml = "0.5.9"
+serde = "1.0.164"
+serde_derive = "1.0.164"
+toml = "0.7.4"
 
 [profile.dev]
 opt-level = 1
